@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.kernel.utils.Utils;
 import org.wso2.carbon.lcm.sql.config.model.LifecycleConfig;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 import org.yaml.snakeyaml.representer.Representer;
 
 import java.io.BufferedReader;
@@ -55,7 +56,9 @@ public class LifecycleConfigBuilder {
         if (lifecycleConfigFileContent.isPresent()) {
             Representer representer = new Representer();
             representer.getPropertyUtils().setSkipMissingProperties(true);
-            Yaml yaml = new Yaml(representer);
+            CustomClassLoaderConstructor constructor =
+                    new CustomClassLoaderConstructor(LifecycleConfigBuilder.class.getClassLoader());
+            Yaml yaml = new Yaml(constructor, representer);
             lifecycleConfig = yaml.loadAs(lifecycleConfigFileContent.get(), LifecycleConfig.class);
         } else {
             lifecycleConfig = defaultConfig.get();
